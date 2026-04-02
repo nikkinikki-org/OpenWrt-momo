@@ -118,6 +118,9 @@ prepare_files() {
 	if [ ! -f "$CORE_LOG_PATH" ]; then
 		touch "$CORE_LOG_PATH"
 	fi
+	if [ ! -f "$DEBUG_LOG_PATH" ]; then
+		touch "$DEBUG_LOG_PATH"
+	fi
 	if [ ! -d "$TEMP_DIR" ]; then
 		mkdir -p "$TEMP_DIR"
 	fi
@@ -126,6 +129,26 @@ prepare_files() {
 clear_log() {
 	echo -n > "$APP_LOG_PATH"
 	echo -n > "$CORE_LOG_PATH"
+	echo -n > "$DEBUG_LOG_PATH"
+}
+
+get_filesize() {
+	local path; path="$1"
+	if [ ! -f "$path" ]; then
+		echo 0
+		return
+	fi
+	wc -c < "$path" | tr -d '[:space:]'
+}
+
+get_total_log_size() {
+	local total_size path path_size
+	total_size=0
+	for path in "$APP_LOG_PATH" "$CORE_LOG_PATH" "$DEBUG_LOG_PATH"; do
+		path_size=$(get_filesize "$path")
+		total_size=$((total_size + path_size))
+	done
+	echo "$total_size"
 }
 
 log() {
