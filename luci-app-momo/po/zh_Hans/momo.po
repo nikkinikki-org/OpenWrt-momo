@@ -432,3 +432,39 @@ msgstr "用户代理（UA）"
 #: applications/luci-app-momo/htdocs/luci-static/resources/view/momo/app.js:128
 msgid "procd Config"
 msgstr "procd 配置"
+
+#: applications/luci-app-momo/htdocs/luci-static/resources/view/momo/log.js:47
+msgid "Check log size at the configured cron schedule before cleaning up."
+msgstr "按设定的 Cron 周期检查日志大小，满足条件后再清理。"
+
+#: applications/luci-app-momo/htdocs/luci-static/resources/view/momo/log.js:53
+msgid "Clear app, core and debug logs when their total size reaches this threshold."
+msgstr "当插件日志、核心日志和调试日志总大小达到该阈值时自动清理。"
+
+#: applications/luci-app-momo/htdocs/luci-static/resources/view/momo/log.js:27
+msgid "Log Cleanup"
+msgstr "日志清理"
+
+#: applications/luci-app-momo/htdocs/luci-static/resources/view/momo/log.js:32
+msgid "Log Cleanup Cron Expression"
+msgstr "日志清理 Cron 表达式"
+
+#: applications/luci-app-momo/htdocs/luci-static/resources/view/momo/log.js:49
+msgid "Log Cleanup Size Threshold (MB)"
+msgstr "日志清理大小阈值（MB）"
+
+#: applications/luci-app-momo/htdocs/luci-static/resources/view/momo/log.js:42
+msgid "Log Size Check Cron Expression"
+msgstr "日志大小检查 Cron 表达式"
+
+#: applications/luci-app-momo/htdocs/luci-static/resources/view/momo/log.js:37
+msgid "Run unconditional log cleanup at the configured cron schedule."
+msgstr "按设定的 Cron 时间无条件执行日志清理。"
+
+#: applications/luci-app-momo/htdocs/luci-static/resources/view/momo/log.js:29
+msgid "Scheduled Log Cleanup"
+msgstr "定时日志清理"
+
+#: applications/luci-app-momo/htdocs/luci-static/resources/view/momo/log.js:39
+msgid "Size-based Log Cleanup"
+msgstr "按大小触发日志清理"

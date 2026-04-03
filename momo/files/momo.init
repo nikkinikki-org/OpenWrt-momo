@@ -9,6 +9,8 @@ PROG="/usr/bin/sing-box"
 . "$IPKG_INSTROOT/etc/momo/scripts/include.sh"
 
 extra_command 'update_subscription' 'Update subscription by section id'
+extra_command 'cleanup_logs' 'Cleanup logs immediately'
+extra_command 'check_log_cleanup' 'Cleanup logs if size threshold is reached'
 
 boot_func() {
 	# prepare files
@@ -56,11 +58,17 @@ start_service() {
 	# get config
 	## app config
 	local scheduled_restart cron_expression profile test_profile core_only
+	local log_cleanup_enabled log_cleanup_cron_expression log_cleanup_size_enabled log_cleanup_size_check_cron_expression log_cleanup_size_mb
 	config_get_bool scheduled_restart "config" "scheduled_restart" 0
 	config_get cron_expression "config" "cron_expression"
 	config_get profile "config" "profile"
 	config_get_bool test_profile "config" "test_profile" 0
 	config_get_bool core_only "config" "core_only" 0
+	config_get_bool log_cleanup_enabled "log" "log_cleanup_enabled" 0
+	config_get log_cleanup_cron_expression "log" "log_cleanup_cron_expression"
+	config_get_bool log_cleanup_size_enabled "log" "log_cleanup_size_enabled" 0
+	config_get log_cleanup_size_check_cron_expression "log" "log_cleanup_size_check_cron_expression"
+	config_get log_cleanup_size_mb "log" "log_cleanup_size_mb" 0
 	## procd config
 	### general
 	local fast_reload
@@ -194,9 +202,23 @@ start_service() {
 
 	procd_close_instance
 	# cron
+	local cron_reload; cron_reload=0
 	if [ "$scheduled_restart" = 1 ] && [ -n "$cron_expression" ]; then
 		log "App" "Set scheduled restart."
-		echo "$cron_expression /etc/init.d/momo restart #momo" >> "/etc/crontabs/root"
+		echo "$cron_expression /etc/init.d/momo restart #momo_scheduled_restart" >> "/etc/crontabs/root"
+		cron_reload=1
+	fi
+	if [ "$log_cleanup_enabled" = 1 ] && [ -n "$log_cleanup_cron_expression" ]; then
+		log "Log" "Set scheduled log cleanup."
+		echo "$log_cleanup_cron_expression /etc/init.d/momo cleanup_logs > /dev/null 2>&1 #momo_log_cleanup_time" >> "/etc/crontabs/root"
+		cron_reload=1
+	fi
+	if [ "$log_cleanup_size_enabled" = 1 ] && [ -n "$log_cleanup_size_check_cron_expression" ] && [ "${log_cleanup_size_mb:-0}" -gt 0 ]; then
+		log "Log" "Set size-based log cleanup check."
+		echo "$log_cleanup_size_check_cron_expression /etc/init.d/momo check_log_cleanup > /dev/null 2>&1 #momo_log_cleanup_size" >> "/etc/crontabs/root"
+		cron_reload=1
+	fi
+	if [ "$cron_reload" = 1 ]; then
 		/etc/init.d/cron restart
 	fi
 	# set started flag
@@ -403,6 +425,46 @@ cleanup() {
 	# delete cron
 	sed -i "/#momo/d" "/etc/crontabs/root" > /dev/null 2>&1
 	/etc/init.d/cron restart
+}
+
+cleanup_logs() {
+	prepare_files
+	run_log_cleanup "scheduled trigger"
+}
+
+check_log_cleanup() {
+	prepare_files
+	config_load momo
+
+	local log_cleanup_size_enabled log_cleanup_size_mb total_size_bytes threshold_size_bytes
+	config_get_bool log_cleanup_size_enabled "log" "log_cleanup_size_enabled" 0
+	config_get log_cleanup_size_mb "log" "log_cleanup_size_mb" 0
+
+	if [ "$log_cleanup_size_enabled" != 1 ] || [ "${log_cleanup_size_mb:-0}" -le 0 ]; then
+		return
+	fi
+
+	total_size_bytes=$(get_total_log_size)
+	threshold_size_bytes=$((log_cleanup_size_mb * 1024 * 1024))
+
+	if [ "$total_size_bytes" -lt "$threshold_size_bytes" ]; then
+		return
+	fi
+
+	run_log_cleanup "size threshold ${log_cleanup_size_mb} MB reached" "$total_size_bytes"
+}
+
+run_log_cleanup() {
+	local reason previous_size
+	reason="$1"
+	previous_size="$2"
+
+	if [ -z "$previous_size" ]; then
+		previous_size=$(get_total_log_size)
+	fi
+
+	clear_log
+	log "Log" "Cleanup executed: ${reason}. Previous total size: $(format_filesize "$previous_size")."
 }
 
 update_subscription() {

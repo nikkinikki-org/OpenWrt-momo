@@ -425,3 +425,39 @@ msgstr ""
 #: applications/luci-app-momo/htdocs/luci-static/resources/view/momo/app.js:128
 msgid "procd Config"
 msgstr ""
+
+#: applications/luci-app-momo/htdocs/luci-static/resources/view/momo/log.js:47
+msgid "Check log size at the configured cron schedule before cleaning up."
+msgstr ""
+
+#: applications/luci-app-momo/htdocs/luci-static/resources/view/momo/log.js:53
+msgid "Clear app, core and debug logs when their total size reaches this threshold."
+msgstr ""
+
+#: applications/luci-app-momo/htdocs/luci-static/resources/view/momo/log.js:27
+msgid "Log Cleanup"
+msgstr ""
+
+#: applications/luci-app-momo/htdocs/luci-static/resources/view/momo/log.js:32
+msgid "Log Cleanup Cron Expression"
+msgstr ""
+
+#: applications/luci-app-momo/htdocs/luci-static/resources/view/momo/log.js:49
+msgid "Log Cleanup Size Threshold (MB)"
+msgstr ""
+
+#: applications/luci-app-momo/htdocs/luci-static/resources/view/momo/log.js:42
+msgid "Log Size Check Cron Expression"
+msgstr ""
+
+#: applications/luci-app-momo/htdocs/luci-static/resources/view/momo/log.js:37
+msgid "Run unconditional log cleanup at the configured cron schedule."
+msgstr ""
+
+#: applications/luci-app-momo/htdocs/luci-static/resources/view/momo/log.js:29
+msgid "Scheduled Log Cleanup"
+msgstr ""
+
+#: applications/luci-app-momo/htdocs/luci-static/resources/view/momo/log.js:39
+msgid "Size-based Log Cleanup"
+msgstr ""

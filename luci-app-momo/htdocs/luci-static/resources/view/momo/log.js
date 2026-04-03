@@ -24,6 +24,34 @@ return view.extend({
 
         m = new form.Map('momo');
 
+        s = m.section(form.NamedSection, 'log', 'log', _('Log Cleanup'));
+
+        o = s.option(form.Flag, 'log_cleanup_enabled', _('Scheduled Log Cleanup'));
+        o.rmempty = false;
+
+        o = s.option(form.Value, 'log_cleanup_cron_expression', _('Log Cleanup Cron Expression'));
+        o.retain = true;
+        o.rmempty = false;
+        o.placeholder = '0 4 * * *';
+        o.depends('log_cleanup_enabled', '1');
+        o.description = _('Run unconditional log cleanup at the configured cron schedule.');
+
+        o = s.option(form.Flag, 'log_cleanup_size_enabled', _('Size-based Log Cleanup'));
+        o.rmempty = false;
+
+        o = s.option(form.Value, 'log_cleanup_size_check_cron_expression', _('Log Size Check Cron Expression'));
+        o.retain = true;
+        o.rmempty = false;
+        o.placeholder = '*/30 * * * *';
+        o.depends('log_cleanup_size_enabled', '1');
+        o.description = _('Check log size at the configured cron schedule before cleaning up.');
+
+        o = s.option(form.Value, 'log_cleanup_size_mb', _('Log Cleanup Size Threshold (MB)'));
+        o.datatype = 'uinteger';
+        o.placeholder = '50';
+        o.depends('log_cleanup_size_enabled', '1');
+        o.description = _('Clear app, core and debug logs when their total size reaches this threshold.');
+
         s = m.section(form.NamedSection, 'placeholder', 'placeholder', _('Log'));
 
         s.tab('app_log', _('App Log'));
@@ -119,8 +147,5 @@ return view.extend({
         };
 
         return m.render();
-    },
-    handleSaveApply: null,
-    handleSave: null,
-    handleReset: null
+    }
 });
